@@ -64,19 +64,123 @@ The designs range from basic building blocks to more complex components widely u
 
 ## 🧠 **Circuit Theory Recap**
 
-- **Adders/Subtractors**: Perform binary addition and subtraction using logic gates that output sum/difference and carry/borrow bits.
+### **1. Adders/Subtractors**
+Adders and subtractors are the fundamental building blocks for arithmetic operations in digital circuits.
+
+- **Half Adder**:  
+  A Half Adder adds two single-bit binary numbers and outputs two results:
+  - **Sum**: The least significant bit (LSB) of the result.
+  - **Carry**: The most significant bit (MSB) of the result, representing any overflow beyond the sum bit-width.
   
-- **Code Converters**: Ensure only one bit changes at a time (Gray code), which reduces errors in digital transitions.
+  Logic:
+  - **Sum** = A ⊕ B (XOR)
+  - **Carry** = A ∧ B (AND)
 
-- **Comparators**: Enable decision-making logic by evaluating equality and order of binary inputs.
+  This is the simplest form of binary addition, but it doesn't handle carry-in from previous stages.
 
-- **Multiplexers/Demultiplexers**: Efficiently route data signals within digital circuits.
+- **Full Adder**:  
+  A Full Adder extends the Half Adder by including a third input: **Carry-In**. It has three inputs (A, B, and Carry-In) and produces two outputs:
+  - **Sum**: The LSB of the result.
+  - **Carry-Out**: The MSB of the result, which may be passed to the next adder in a multi-bit addition.
 
-- **ALU**: A central unit for performing arithmetic operations controlled by operation codes.
+  Logic:
+  - **Sum** = A ⊕ B ⊕ Carry-In
+  - **Carry-Out** = (A ∧ B) ∨ (Carry-In ∧ (A ⊕ B))
 
-- **Decoders**: Decode input codes to activate a single output line, essential for memory addressing and instruction decoding.
+  Full adders are the building blocks for multi-bit adders like 4-bit or 8-bit adders, often arranged in **ripple carry adders**.
+
+- **Subtractor**:  
+  A subtractor performs binary subtraction, and there are two main types:
+  
+  - **Half Subtractor**: This takes two inputs, A and B, and produces a **difference** and a **borrow**.
+    - **Difference** = A ⊕ B
+    - **Borrow** = (¬A) ∧ B
+
+  - **Full Subtractor**: This is similar to the full adder but with an additional **Borrow-In** input. The outputs are **Difference** and **Borrow-Out**.
+    - **Difference** = A ⊕ B ⊕ Borrow-In
+    - **Borrow-Out** = (¬A ∧ B) ∨ (¬A ∧ Borrow-In) ∨ (B ∧ Borrow-In)
+
+### **2. Code Converters**
+- **Binary to Gray Code Converter**:  
+  Gray code is a binary numeral system where two successive values differ in only one bit, reducing the possibility of errors during state transitions, especially in hardware like rotary encoders.
+
+  To convert from binary to Gray:
+  - **Gray(0) = Binary(0)**
+  - **Gray(n) = Binary(n) ⊕ Binary(n-1)** for all bits (except the most significant one).
+
+  Gray code is particularly useful in **position encoders** where minimizing errors during bit transitions is crucial.
+
+- **Gray Code to Binary Converter**:  
+  To convert Gray code back to binary, you use the following iterative process:
+  - **Binary(0) = Gray(0)**
+  - **Binary(n) = Binary(n-1) ⊕ Gray(n)** for all bits.
+
+  Gray code is used in many practical applications, such as **error correction** in communication systems and **motion sensors**.
+
+### **3. Multiplexers and Demultiplexers**
+- **Multiplexer (MUX)**:  
+  A multiplexer is a combinational circuit that selects one of many input signals and forwards the selected input to a single output line. The selection is determined by a set of **select lines**.
+  
+  A 2-to-1 multiplexer is represented by the following logic:
+  - **Output** = (S̅ ∧ A) ∨ (S ∧ B), where S is the select line and A, B are input lines.
+
+  **Applications**: Multiplexers are used in **data routing**, **signal processing**, and **CPU data selection**.
+
+- **Demultiplexer (DEMUX)**:  
+  A demultiplexer takes a single input and routes it to one of many output lines based on the select line. Essentially, it's the inverse of a multiplexer.
+  
+  A 1-to-2 demultiplexer is represented by the logic:
+  - **Output 0** = S̅ ∧ Input
+  - **Output 1** = S ∧ Input
+
+  **Applications**: Demultiplexers are used in **data distribution systems** like routers, or in **memory address decoding**.
+
+- **Priority Encoder**:  
+  A priority encoder is a combinational circuit that converts multiple input lines into a binary code representing the index of the highest-priority active input. The encoder gives precedence to the highest input with a 1.
+
+  For a 4-to-2 priority encoder:
+  - If input lines I3, I2, I1, and I0 are the inputs, the output will represent the highest priority active input.
+  
+  **Applications**: Used in **interrupt controllers** or **priority decision-making systems**.
+
+### **4. Arithmetic Logic Unit (ALU)**
+An ALU is the heart of many digital computers, capable of performing a wide range of arithmetic and logical operations. A typical ALU supports several operations, controlled by **opcode inputs**.
+
+Operations in a simple ALU might include:
+- **Addition** (A + B)
+- **Subtraction** (A - B)
+- **Multiplication** (A × B)
+- **Division** (A ÷ B)
+- **Modulo** (A % B)
+- **Logical AND, OR, NOT, XOR**
+
+The ALU uses a set of multiplexers and logic gates to choose which operation to perform based on the opcode input. The **control unit** selects the operation by changing the opcode sent to the ALU.
+
+**Applications**: Used in **processors** for executing instructions, **FPGA** and **ASIC** design for custom computation units, etc.
+
+### **5. Decoders**
+- **3-to-8 Decoder**:  
+  A decoder takes an n-bit binary input and activates one of 2^n outputs. For example, a **3-to-8 decoder** takes a 3-bit input and activates one of 8 outputs corresponding to the binary value of the input.
+
+  The **truth table** of a 3-to-8 decoder would have:
+  - 000 → Output 0
+  - 001 → Output 1
+  - 010 → Output 2
+  - 011 → Output 3
+  - etc.
+
+  **Applications**: Decoders are often used in **memory addressing** (e.g., RAM addressing) and **instruction decoding** in processors.
+
+### **6. Utility Files**
+- **run1.do**:  
+  This script automates the process of compiling and simulating all Verilog files in the repository using ModelSim. By running this file, users can simulate the entire set of modules with one simple command, reducing setup time.
 
 ---
+
+### **Conclusion**
+Each of these circuits plays a critical role in digital systems, from basic arithmetic to complex data routing. Understanding their theory and practical applications forms the backbone of designing efficient and reliable digital systems, whether for FPGAs, ASICs, or software simulations.
+
+These building blocks are widely used in **microprocessors**, **digital controllers**, **communication systems**, **embedded systems**, and many other applications, making them essential knowledge for anyone pursuing digital design, hardware development, or FPGA programming.
 
 ## 🎯 **Purpose of This Repository**
 
